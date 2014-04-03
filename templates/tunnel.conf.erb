@@ -15,7 +15,7 @@ respawn limit 10 5
 umask 022
 
 script
-  <% if @autossh_gatetime -%>
+<% if @autossh_gatetime -%>
   export AUTOSSH_GATETIME=<%= @autossh_gatetime %>
 <% end -%>
 <% if @autossh_logfile -%>
