@@ -1,6 +1,13 @@
+# FIXME: $remote_port doesn't seem to be used
+#
+# Define an autossh tunnel.
+#
+# This is the main entry point for this module.
+#
 define autossh::tunnel (
+  $ensure              = running,
+  $enable              = true,
   $service             = "autossh-${title}",
-  $ensure              = 'running',
   $user                = 'root',
   $group               = 'root',
   $ssh_id_file         = '~/.ssh/id_rsa',
@@ -23,7 +30,7 @@ define autossh::tunnel (
 
   include autossh::params
 
-  $ssh_config = "${autossh::params::configdir}/${service}.conf"
+  $ssh_config = "${autossh::params::configdir}/${title}.conf"
 
   if $remote_forwarding == true {
     $template_path = 'autossh/remoteforward.config.erb'
@@ -31,6 +38,14 @@ define autossh::tunnel (
     $template_path = 'autossh/localforward.config.erb'
   }
 
+  if (!$remote_user) {
+    $real_remote_user = $user
+  } else {
+    $real_remote_user = $remote_user
+  }
+
+
+  # a generic config file used by all service systems
   file { $ssh_config:
     ensure  => file,
     path    => $ssh_config,
@@ -40,26 +55,27 @@ define autossh::tunnel (
     require => File[$autossh::params::configdir],
   }
 
-  autossh::tunnel::config::upstart { $service:
-    service             => $service,
+  # service-specific config
+  autossh::config { $service:
     user                => $user,
-    group               => $group,
-    ssh_id_file         => $ssh_id_file,
-    remote_user         => $remote_user,
+    ssh_config          => $ssh_config,
+    remote_user         => $real_remote_user,
     remote_host         => $remote_host,
+    remote_port         => $remote_port,        # FIXME: not used?
+    ssh_id_file         => $ssh_id_file,
     monitor_port        => $monitor_port,
-    autossh_background  => $autossh_background,
+    autossh_background  => $autossh_background, # FIXME: not used?
     autossh_gatetime    => $autossh_gatetime,
     autossh_logfile     => $autossh_logfile,
     autossh_first_poll  => $autossh_first_poll,
     autossh_poll        => $autossh_poll,
     autossh_maxlifetime => $autossh_maxlifetime,
     autossh_maxstart    => $autossh_maxstart,
-    ssh_config          => $ssh_config,
   }
 
-  autossh::tunnel::service::upstart { $service:
+  autossh::service { $service:
     ensure     => $ensure,
+    enable     => $enable,
     ssh_config => $ssh_config,
   }
 }

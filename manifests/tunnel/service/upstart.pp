@@ -3,9 +3,10 @@
 # This define manages the service for this tunnel through upstart
 #
 define autossh::tunnel::service::upstart (
-  $ssh_config,
+  $ensure     = running,
+  $enable     = true,
   $service    = $title,
-  $ensure     = true,
+  $ssh_config,
 ) {
 
   include autossh::params

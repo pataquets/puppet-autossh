@@ -34,6 +34,6 @@ script
   export AUTOSSH_MAXSTART=<%= @autossh_maxstart %>
 <% end -%>
 
-  exec su <%= @user %> -c "autossh -M <%= @monitor_port %> -NF <%= @ssh_config %> -i <%= @ssh_id_file %> <%= @real_remote_user %>@<%= @remote_host %>"
+  exec su <%= @user %> -c "autossh -M <%= @monitor_port %> -NF <%= @ssh_config %> -i <%= @ssh_id_file %> <%= @remote_user %>@<%= @remote_host %>"
 
 end script

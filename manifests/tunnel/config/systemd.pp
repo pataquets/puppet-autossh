@@ -1,9 +1,10 @@
-# = Define: autossh::tunnel::config::upstart
+# = Define: autossh::tunnel::config::systemd
 #
 # This define deploys the config for managing this tunnel service through
-# upstart
+# systemd
 #
-define autossh::tunnel::config::upstart (
+
+define autossh::tunnel::config::systemd (
   $service             = $title,
   $user                = 'root',
   $group               = 'root',
@@ -22,11 +23,16 @@ define autossh::tunnel::config::upstart (
   $ssh_config,
 ) {
 
-  file { "/etc/init/${service}.conf":
+  exec { "${service}-systemd-daemon-reload":
+    command     => '/usr/bin/systemctl daemon-reload',
+    refreshonly => true,
+  }
+
+  file { "/lib/systemd/system/${service}.service":
     ensure  => file,
     owner   => $user,
     group   => $group,
-    content => template('autossh/service/upstart'),
+    content => template('autossh/service/systemd'),
+    notify  => Exec["${service}-systemd-daemon-reload"],
   }
-
 }
