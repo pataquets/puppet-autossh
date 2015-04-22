@@ -1,0 +1,15 @@
+[Unit]
+Description=Keeps a tunnel to '<%= @remote_user %>@<%= @remote_host %>' open
+After=network.target
+ 
+[Service]
+User=<%= @user %>
+# -p [PORT]
+# -l [user]
+# -M 0 --> no monitoring
+# -N Just open the connection and do nothing (not interactive)
+# LOCALPORT:IP_ON_EXAMPLE_COM:PORT_ON_EXAMPLE_COM
+ExecStart=/usr/bin/autossh -M <%= @monitor_port %> -NF <%= @ssh_config %> -i <%= @ssh_id_file %> <%= @remote_user %>@<%= @remote_host %>
+ 
+[Install]
+WantedBy=multi-user.target

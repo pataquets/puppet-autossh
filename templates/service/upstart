@@ -1,0 +1,39 @@
+# THIS FILE IS MANAGED BY PUPPET. DO NOT EDIT!
+
+# tunnel - secure tunnel back to a known server
+#
+# Provides for remote access
+
+description "ssh tunnel"
+
+start on (local-filesystems and network-device-up)
+stop on runlevel [!12345]
+
+# expect fork
+respawn
+respawn limit 10 5
+umask 022
+
+script
+<% if @autossh_gatetime -%>
+  export AUTOSSH_GATETIME=<%= @autossh_gatetime %>
+<% end -%>
+<% if @autossh_logfile -%>
+  export AUTOSSH_LOGFILE=<%= @autossh_logfile %>
+<% end -%>
+<% if @autossh_first_poll -%>
+  export AUTOSSH_FIRST_POLL=<%= @autossh_first_poll %>
+<% end -%>
+<% if @autossh_poll -%>
+  export AUTOSSH_POLL=<%= @autossh_poll %>
+<% end -%>
+<% if @autossh_maxlifetime -%>
+  export AUTOSSH_MAXLIFETIME=<%= @autossh_maxlifetime %>
+<% end -%>
+<% if @autossh_maxstart -%>
+  export AUTOSSH_MAXSTART=<%= @autossh_maxstart %>
+<% end -%>
+
+  exec su <%= @user %> -c "autossh -M <%= @monitor_port %> -NF <%= @ssh_config %> -i <%= @ssh_id_file %> <%= @remote_user %>@<%= @remote_host %>"
+
+end script

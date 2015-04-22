@@ -1,7 +1,9 @@
 class autossh {
   include stdlib
 
-  file { "/opt/autossh":
+  include autossh::params
+
+  file { $autossh::params::configdir:
     ensure  => directory,
     recurse => true,
   } ->
@@ -10,4 +12,3 @@ class autossh {
     ensure => present,
   }
 }
-
